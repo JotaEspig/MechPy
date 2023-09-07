@@ -31,29 +31,24 @@ class Maneuver:
         self.vessel.auto_pilot.target_direction = (0, 1, 0)
         self.vessel.auto_pilot.wait()
 
-        time_to_stream = self.conn.add_stream(getattr, self.node, "time_to")
         # waits until the vessel is ready to start the burn
-        while time_to_stream() - (burn_time / 2) > 0:
+        while self.time_to_stream() - (burn_time / 2) > 0:
             ...
-
-        remaining_burn_stream = self.conn.add_stream(
-            self.node.remaining_burn_vector, None
-        )
 
         self.vessel.control.throttle = 1
         time_to_sleep = burn_time - 0.75
         sleep(time_to_sleep)
 
         self.vessel.control.throttle = 0.5
-        while Maneuver.should_keep_burning(remaining_burn_stream, 5):
+        while Maneuver.should_keep_burning(self.remaining_burn_stream, 5):
             ...
 
         self.vessel.control.throttle = 0.05
-        while Maneuver.should_keep_burning(remaining_burn_stream, 0.5):
+        while Maneuver.should_keep_burning(self.remaining_burn_stream, 0.5):
             ...
 
         self.vessel.control.throttle = 0.01
-        while Maneuver.should_keep_burning(remaining_burn_stream, 0.1):
+        while Maneuver.should_keep_burning(self.remaining_burn_stream, 0.1):
             ...
         
         self.vessel.control.throttle = 0
