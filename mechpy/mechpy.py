@@ -5,6 +5,7 @@ import krpc
 
 from mechpy import launch
 from mechpy import maneuver
+from mechpy import suicideburn
 
 class MechPy:
     def __init__(self):
@@ -28,3 +29,7 @@ class MechPy:
         launch.Launch(
             self.conn, vessel, target_alt, turn_start_alt, turn_end_alt
         ).do()
+
+    def suicide_burn(self) -> None:
+        vessel = self.conn.space_center.active_vessel
+        suicideburn.SuicideBurn(self.conn, vessel).do()
