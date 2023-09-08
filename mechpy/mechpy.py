@@ -3,8 +3,8 @@ from math import exp
 
 import krpc
 
-from mechpy.maneuver import Maneuver
-
+from mechpy import launch
+from mechpy import maneuver
 
 class MechPy:
     def __init__(self):
@@ -13,7 +13,18 @@ class MechPy:
     def __del__(self):
         self.conn.close()
 
+
     def do_maneuver(self):
         vessel = self.conn.space_center.active_vessel
+        if len(vessel.control.nodes) == 0:
+            return
+
         node = vessel.control.nodes[0]
-        Maneuver(self.conn, vessel, node).do()
+        maneuver.Maneuver(self.conn, vessel, node)
+
+    def launch_into_orbit(self, target_alt: int, turn_start_alt: int,
+                          turn_end_alt: int) -> None:
+        vessel = self.conn.space_center.active_vessel
+        launch.Launch(
+            self.conn, vessel, target_alt, turn_start_alt, turn_end_alt
+        ).do()
