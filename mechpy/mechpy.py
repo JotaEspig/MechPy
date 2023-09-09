@@ -16,11 +16,8 @@ class MechPy:
         self.conn.close()
 
 
-    def show_message(self, content: str, duration=1) -> None:
-        self.conn.ui.message(content, duration=duration)
-
     def do_maneuver(self):
-        self.show_message("Doing maneuver", duration=2)
+        self.conn.ui.message("Doing maneuver", duration=2)
 
         vessel = self.conn.space_center.active_vessel
         if len(vessel.control.nodes) == 0:
@@ -39,7 +36,7 @@ class MechPy:
         ).do()
 
     def suicide_burn(self) -> None:
-        self.show_message("Doing SUICIDE BURN\nI hope we don't crash", duration=2)
+        self.conn.ui.message("Doing SUICIDE BURN\nI hope we don't crash", duration=2)
 
         vessel = self.conn.space_center.active_vessel
         suicideburn.SuicideBurn(self.conn, vessel).do()
