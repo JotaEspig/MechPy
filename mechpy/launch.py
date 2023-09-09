@@ -46,6 +46,7 @@ class Launch:
 
     def do(self) -> None:
         self.vessel.control.throttle = 1
+        self.vessel.auto_pilot.reference_frame = self.vessel.surface_reference_frame
         self.vessel.auto_pilot.engage()
         self.vessel.auto_pilot.target_pitch_and_heading(90, 90)
 
@@ -56,9 +57,10 @@ class Launch:
 
         # turn off the engines and waits to be out of atmosphere
         self.vessel.control.throttle = 0
-        while self.altitude_stream() <= 70000:
+        atmosphere_alt = self.vessel.orbit.body.atmosphere_depth
+        while self.altitude_stream() <= atmosphere_alt:
             # check if apoapsis is inside the atmosphere and the burn
-            if self.apoapsis_stream() <= 70000 and self.throttle_stream() < 1:
+            if self.apoapsis_stream() <= atmosphere_alt and self.throttle_stream() < 1:
                 self.vessel.control.throttle = 1
 
         # do the final maneuver
@@ -67,8 +69,7 @@ class Launch:
             self.ut_stream() + self.vessel.orbit.time_to_apoapsis, delta_v
         )
         maneuver.Maneuver(self.conn, self.vessel, node).do()
-        self.vessel.auto_pilot.disengage()
-        self.vessel.control.sas = True
+        self.reset_auto_pilot()
 
     def do_gravitational_turn(self) -> None:
         current_altitude = self.altitude_stream()
@@ -92,3 +93,7 @@ class Launch:
         v2 = math.sqrt(mu * ((2 / r) - (1 / a2)))
         delta_v = v2 - v1
         return delta_v
+
+    def reset_auto_pilot(self) -> None:
+        self.vessel.auto_pilot.disengage()
+        self.vessel.control.sas = True

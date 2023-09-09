@@ -36,7 +36,7 @@ class Maneuver:
             ...
 
         self.vessel.control.throttle = 1
-        time_to_sleep = burn_time - 0.75
+        time_to_sleep = burn_time - 0.5
         sleep(time_to_sleep)
 
         self.vessel.control.throttle = 0.5
@@ -51,9 +51,11 @@ class Maneuver:
         while Maneuver.should_keep_burning(self.remaining_burn_stream, 0.1):
             ...
         
-        self.vessel.control.throttle = 0
         self.node.remove()
+        self.vessel.control.throttle = 0
+        self.reset_auto_pilot()
 
+    def reset_auto_pilot(self) -> None:
         self.vessel.auto_pilot.disengage()
         self.vessel.control.sas = True
 

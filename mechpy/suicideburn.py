@@ -11,6 +11,12 @@ class SuicideBurn:
         self.conn = conn
         self.vessel = vessel
         self.flight = self.vessel.flight(self.vessel.orbit.body.reference_frame)
+        self.leg_size = 1
+        if len(self.vessel.parts.legs) > 0:
+            leg = self.vessel.parts.legs[0]
+            refframe = self.vessel.reference_frame
+            bounding_box = leg.part.bounding_box(refframe)
+            self.leg_size = abs(bounding_box[0][2]) + abs(bounding_box[1][2])
 
         # streams
         self.thrust_stream = self.conn.add_stream(
@@ -49,12 +55,11 @@ class SuicideBurn:
         self.height_stream.remove()
 
 
-    def do(self) -> None:
+    def do(self) -> bool:
         if self.thrust_stream() == 0:
-            return
+            return False
 
-        # TODO discover why I add 5 here
-        dist_center_to_bottom = self.get_distance_vessel_center_to_bottom() + 5
+        dist_center_to_bottom = self.get_distance_vessel_center_to_bottom() + self.leg_size
         safe_margin = dist_center_to_bottom + self.SAFE_MARGIN_OFFSET
 
         self.vessel.auto_pilot.engage()
@@ -79,8 +84,8 @@ class SuicideBurn:
             self.vessel.control.throttle = thrust_final_speed
 
         self.vessel.control.throttle = 0
-        self.vessel.auto_pilot.disengage()
-        self.vessel.control.sas = True
+        self.reset_auto_pilot()
+        return True
 
     def get_twr(self) -> float:
         gravity = self.vessel.orbit.body.surface_gravity
@@ -114,8 +119,8 @@ class SuicideBurn:
 
     def get_distance_vessel_center_to_bottom(self) -> float:
         refframe = self.vessel.reference_frame
-        bbox = self.vessel.bounding_box(refframe)
-        min_y = bbox[0][2]
+        bounding_box = self.vessel.bounding_box(refframe)
+        min_y = bounding_box[0][2]
         return abs(min_y)
 
     def set_direction_to_retrograde(self) -> None:
@@ -131,3 +136,8 @@ class SuicideBurn:
         time = current_speed / acceleration
         height = (current_speed / 2) * time
         return height
+
+    def reset_auto_pilot(self) -> None:
+        self.vessel.auto_pilot.reference_frame = self.vessel.surface_reference_frame
+        self.vessel.auto_pilot.disengage()
+        self.vessel.control.sas = True
