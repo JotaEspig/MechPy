@@ -10,6 +10,7 @@ class MechPy:
         self.conn.ui.message("MechPy\nVersion: v0.1", duration=5)
     
     def __del__(self):
+        self.conn.ui.message("MechPy closed", duration=5)
         self.conn.close()
 
 
