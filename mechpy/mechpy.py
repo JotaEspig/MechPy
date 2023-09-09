@@ -24,11 +24,11 @@ class MechPy:
             return
 
         node = vessel.control.nodes[0]
-        maneuver.Maneuver(self.conn, vessel, node)
+        maneuver.Maneuver(self.conn, vessel, node).do()
 
     def launch_into_orbit(self, target_alt: int, turn_start_alt: int,
                           turn_end_alt: int) -> None:
-        self.show_message("Launching into orbit", duration=2)
+        self.conn.ui.message("Launching into orbit", duration=2)
 
         vessel = self.conn.space_center.active_vessel
         launch.Launch(
