@@ -1,6 +1,3 @@
-from time import sleep
-from math import exp
-
 import krpc
 
 from mechpy import launch
