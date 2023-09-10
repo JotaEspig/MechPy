@@ -56,10 +56,8 @@ def main() -> None:
     # just_fix_windows_console()
     # menu()
     mech = mechpy.MechPy()
-    r = -1
-    while (r != 0):
-        r = int(input())
-        mech.display.rect.position = tuple([mech.display.rect.position[0], r])
+    mech.display.add_text("hello")
+    input()
 
 
 if __name__ == "__main__":
