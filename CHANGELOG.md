@@ -1,3 +1,13 @@
+## v0.2.0 (2023-09-10)
+
+### Feat
+
+- **displayer**: added displayer
+
+### Refactor
+
+- minor changes
+
 ## v0.1.0 (2023-09-09)
 
 ### Feat
