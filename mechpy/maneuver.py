@@ -14,12 +14,13 @@ class Maneuver:
         self.vessel = vessel
         self.node = node
         self.time_to_stream = self.conn.add_stream(getattr, node, "time_to")
-        self.remaining_burn_stream = self.conn.add_stream(node.remaining_burn_vector, None)
-    
+        self.remaining_burn_stream = self.conn.add_stream(
+            node.remaining_burn_vector, None
+        )
+
     def __del__(self) -> None:
         self.time_to_stream.remove()
         self.remaining_burn_stream.remove()
-
 
     def do(self) -> None:
         delta_v = self.node.delta_v
@@ -50,7 +51,7 @@ class Maneuver:
         self.vessel.control.throttle = 0.01
         while Maneuver.should_keep_burning(self.remaining_burn_stream, 0.1):
             ...
-        
+
         self.node.remove()
         self.vessel.control.throttle = 0
         self.reset_auto_pilot()
@@ -58,7 +59,6 @@ class Maneuver:
     def reset_auto_pilot(self) -> None:
         self.vessel.auto_pilot.disengage()
         self.vessel.control.sas = True
-
 
     @staticmethod
     def get_burn_time(vessel: spacecenter.Vessel,
@@ -74,6 +74,6 @@ class Maneuver:
     @staticmethod
     def should_keep_burning(stream: stream.Stream, value) -> bool:
         remaining = stream()
-        return (remaining[0] > value)       \
-                or (remaining[1] > value)   \
-                or (remaining[2] > value)
+        return (remaining[0] > value) \
+            or (remaining[1] > value) \
+            or (remaining[2] > value)

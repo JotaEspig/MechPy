@@ -43,7 +43,6 @@ class Launch:
         self.apoapsis_stream.remove()
         self.time_to_apoapsis_stream.remove()
 
-
     def do(self) -> None:
         self.vessel.control.throttle = 1
         self.vessel.auto_pilot.reference_frame = self.vessel.surface_reference_frame
@@ -74,13 +73,14 @@ class Launch:
     def do_gravitational_turn(self) -> None:
         current_altitude = self.altitude_stream()
         should_do = current_altitude >= self.turn_start_alt \
-                    and current_altitude <= self.turn_end_alt
+            and current_altitude <= self.turn_end_alt
 
         if should_do:
             frac = (current_altitude - self.turn_start_alt) \
-                    / (self.turn_end_alt - self.turn_start_alt)
+                / (self.turn_end_alt - self.turn_start_alt)
             turn_angle = frac * 90
-            self.vessel.auto_pilot.target_pitch_and_heading(90 - turn_angle, 90)
+            self.vessel.auto_pilot.target_pitch_and_heading(
+                90 - turn_angle, 90)
 
     def get_delta_v_necessary(self) -> float:
         mu = self.vessel.orbit.body.gravitational_parameter

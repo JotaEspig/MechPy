@@ -10,7 +10,9 @@ class SuicideBurn:
     def __init__(self, conn: krpc.Client, vessel: spacecenter.Vessel) -> None:
         self.conn = conn
         self.vessel = vessel
-        self.flight = self.vessel.flight(self.vessel.orbit.body.reference_frame)
+        self.flight = self.vessel.flight(
+            self.vessel.orbit.body.reference_frame
+        )
         self.leg_size = 1
         if len(self.vessel.parts.legs) > 0:
             leg = self.vessel.parts.legs[0]
@@ -54,22 +56,22 @@ class SuicideBurn:
         self.h_speed_stream.remove()
         self.height_stream.remove()
 
-
     def do(self) -> bool:
         if self.thrust_stream() == 0:
             return False
 
-        dist_center_to_bottom = self.get_distance_vessel_center_to_bottom() + self.leg_size
+        dist_center_to_bottom = self.get_distance_vessel_center_to_bottom() + \
+            self.leg_size
         safe_margin = dist_center_to_bottom + self.SAFE_MARGIN_OFFSET
 
         self.vessel.auto_pilot.engage()
         self.vessel.auto_pilot.reference_frame = self.vessel.orbit.body.\
-                                                 reference_frame
+            reference_frame
 
         self.set_direction_to_retrograde()
         self.vessel.control.speed_mode = spacecenter.SpeedMode.surface
 
-        self.reduce_horizontal_speed()        
+        self.reduce_horizontal_speed()
 
         self.vessel.control.throttle = 0
         self.vessel.control.speed_mode = spacecenter.SpeedMode.surface
