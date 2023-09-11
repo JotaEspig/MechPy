@@ -1,7 +1,14 @@
+import time
+
 from colorama import Fore
 from colorama import just_fix_windows_console
 
 from mechpy import mechpy
+from mechpy import displayer
+
+
+def reset_display(mech: mechpy.MechPy) -> None:
+    del mech.display
 
 
 def maneuver(mech: mechpy.MechPy) -> None:
@@ -9,9 +16,29 @@ def maneuver(mech: mechpy.MechPy) -> None:
 
 
 def launch_into_orbit(mech: mechpy.MechPy) -> None:
-    target = int(input("Target altitude: "))
-    start_turn = int(input("Gravitational turn start altitude: "))
-    end_turn = int(input("Gravitational turn end altitude: "))
+    size = mech.display.rect.size
+    pos = mech.display.rect.position
+    display = displayer.Displayer(
+        mech.conn, size, (pos[0], pos[1] - size[1])
+    )
+
+    display.add_text("Target altitude:", (-65, 70))
+    display.add_text("Turn start altitude:", (-65, 20))
+    display.add_text("Turn end altitude:", (-65, -30))
+
+    target_input_idx = display.add_input_field((-65, 50))
+    start_turn_input_idx = display.add_input_field((-65, 0))
+    end_turn_input_idx = display.add_input_field((-65, -50))
+
+    button_idx = display.add_button("Go!", (0, -80))
+    button_stream = display.get_button_clicked_stream(button_idx)
+    while button_stream() == False:
+        time.sleep(0.1)
+
+    target = int(display.input_fields[target_input_idx].value)
+    start_turn = int(display.input_fields[start_turn_input_idx].value)
+    end_turn = int(display.input_fields[end_turn_input_idx].value)
+
     mech.launch_into_orbit(target, start_turn, end_turn)
 
 
@@ -53,11 +80,8 @@ def menu() -> None:
 
 
 def main() -> None:
-    # just_fix_windows_console()
-    # menu()
-    mech = mechpy.MechPy()
-    mech.display.add_text("hello")
-    input()
+    just_fix_windows_console()
+    menu()
 
 
 if __name__ == "__main__":
